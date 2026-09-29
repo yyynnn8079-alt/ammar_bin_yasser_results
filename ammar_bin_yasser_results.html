@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>نتائج مدرسة عمار بن ياسر</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial,sans-serif;background:#f3f6fb;color:#172033}
+header{background:#123c69;color:#fff;padding:26px 16px;text-align:center}
+header h1{margin:0 0 8px;font-size:28px} header p{margin:0;opacity:.9}
+.container{max-width:950px;margin:28px auto;padding:0 16px}
+.card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 8px 28px #00000012;margin-bottom:20px}
+.search{display:flex;gap:10px;max-width:620px;margin:0 auto}
+input,button,select{font:inherit;border-radius:10px;padding:13px;border:1px solid #d6dce5}
+input{flex:1}button{background:#1769aa;color:#fff;border:0;cursor:pointer;font-weight:bold}
+button:hover{opacity:.92}.hint{text-align:center;color:#687386;font-size:14px;margin-top:12px}
+.result{display:none}.student{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.box{background:#f5f8fc;border-radius:12px;padding:14px}.label{color:#6b7482;font-size:13px}.value{font-weight:bold;margin-top:5px}
+table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid #e5e9ef;text-align:center}th{background:#eef4fa}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.summary .box{text-align:center}
+.ok{color:#138a45;font-weight:bold}.bad{color:#c52c2c;font-weight:bold}
+footer{text-align:center;color:#788395;padding:25px}
+@media(max-width:650px){.search{flex-direction:column}.student,.summary{grid-template-columns:1fr}header h1{font-size:23px}th,td{padding:9px 5px;font-size:14px}}
+</style>
+</head>
+<body>
+<header>
+<h1>مدرسة عمار بن ياسر</h1>
+<p>نظام الاستعلام عن نتائج الطلاب</p>
+</header>
+
+<main class="container">
+<section class="card">
+<h2 style="text-align:center">استعلام عن النتيجة</h2>
+<div class="search">
+<input id="seat" inputmode="numeric" placeholder="أدخل رقم الجلوس">
+<button onclick="findResult()">عرض النتيجة</button>
+</div>
+<div class="hint">أدخل رقم الجلوس فقط لمعرفة النتيجة</div>
+<div id="message" class="hint"></div>
+</section>
+
+<section id="result" class="card result">
+<h2 style="text-align:center">نتيجة الطالب</h2>
+<div class="student">
+<div class="box"><div class="label">اسم الطالب</div><div class="value" id="name">-</div></div>
+<div class="box"><div class="label">رقم الجلوس</div><div class="value" id="seatOut">-</div></div>
+<div class="box"><div class="label">الصف</div><div class="value" id="classOut">-</div></div>
+</div>
+<table>
+<thead><tr><th>المادة</th><th>الدرجة</th><th>من</th></tr></thead>
+<tbody id="subjects"></tbody>
+</table>
+<div class="summary">
+<div class="box"><div class="label">المجموع</div><div class="value" id="total">-</div></div>
+<div class="box"><div class="label">النسبة</div><div class="value" id="percent">-</div></div>
+<div class="box"><div class="label">الحالة</div><div class="value" id="status">-</div></div>
+</div>
+</section>
+
+<section class="card">
+<h3>لوحة الإدارة</h3>
+<p>هذه النسخة مجهزة للربط بقاعدة بيانات مركزية. عند النشر، يتم وضع بيانات الطلاب في قاعدة البيانات، ويبحث الطالب برقم الجلوس فقط.</p>
+</section>
+</main>
+<footer>مدرسة عمار بن ياسر — نظام نتائج الطلاب</footer>
+
+<script>
+/* بيانات تجريبية للتجربة فقط. عند النشر تستبدل بقاعدة بيانات مركزية. */
+const demo={
+ "1001":{name:"طالب تجريبي",className:"الثالث الثانوي",subjects:[
+  ["اللغة العربية",82,100],["الرياضيات",91,100],["اللغة الإنجليزية",76,100],
+  ["الفيزياء",88,100],["الكيمياء",79,100]],total:416,max:500}
+};
+
+function findResult(){
+ const seat=document.getElementById("seat").value.trim();
+ const msg=document.getElementById("message"), box=document.getElementById("result");
+ if(!seat){msg.textContent="أدخل رقم الجلوس أولاً.";box.style.display="none";return}
+ const s=demo[seat];
+ if(!s){msg.textContent="لم يتم العثور على نتيجة لهذا الرقم.";box.style.display="none";return}
+ msg.textContent="";
+ document.getElementById("name").textContent=s.name;
+ document.getElementById("seatOut").textContent=seat;
+ document.getElementById("classOut").textContent=s.className;
+ document.getElementById("subjects").innerHTML=s.subjects.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td></tr>`).join("");
+ const p=(s.total/s.max*100);
+ document.getElementById("total").textContent=s.total+" / "+s.max;
+ document.getElementById("percent").textContent=p.toFixed(1)+"%";
+ const passed=p>=50;
+ document.getElementById("status").textContent=passed?"ناجح":"راسب";
+ document.getElementById("status").className=passed?"value ok":"value bad";
+ box.style.display="block";
+}
+document.getElementById("seat").addEventListener("keydown",e=>{if(e.key==="Enter")findResult()});
+</script>
+</body>
+</html>
